@@ -1,0 +1,64 @@
+[
+  {
+    "ContainingType": "ServerGame106.Controllers.APIGameController",
+    "Method": "GetAllGameLevel",
+    "RelativePath": "api/APIGame/GetAllGameLevel",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerGame106.Controllers.APIGameController",
+    "Method": "GetAllQuestionGame",
+    "RelativePath": "api/APIGame/GetAllQuestionGame",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerGame106.Controllers.APIGameController",
+    "Method": "GetAllRegion",
+    "RelativePath": "api/APIGame/GetAllRegion",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerGame106.Controllers.APIGameController",
+    "Method": "Login",
+    "RelativePath": "api/APIGame/Login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginRequest",
+        "Type": "Microsoft.AspNetCore.Identity.Data.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerGame106.Controllers.APIGameController",
+    "Method": "Register",
+    "RelativePath": "api/APIGame/Register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "registerDTO",
+        "Type": "ServerGame106.DTO.RegisterDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

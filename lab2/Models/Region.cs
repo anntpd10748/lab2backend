@@ -6,6 +6,6 @@ namespace ServerGame106.Models
     {
         public int RegionId { get; set; }
         [Required]
-        public string RegionName { get; set; }
+        public string Name { get; set; }
     }
 }

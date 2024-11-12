@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ServerGame106.Models;
+
 namespace ServerGame106.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -21,8 +22,8 @@ namespace ServerGame106.Data
                 new GameLevel { LevelID = 3, title = "level 3"}
             );
             modelBuilder.Entity<Region>().HasData(
-                new Region { RegionId = 1, RegionName = "dong bang song hong"},
-                new Region { RegionId =2, RegionName = "dong bang song cuu long"}
+                new Region { RegionId = 1, Name = "dong bang song hong"},
+                new Region { RegionId =2, Name = "dong bang song cuu long"}
             );
             modelBuilder.Entity<Question>().HasData(
                 new Question
