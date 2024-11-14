@@ -296,5 +296,240 @@ namespace ServerGame106.Controllers
                 return BadRequest(_response);
             }
         }
+        [HttpPut("ChangeUserPassword")]
+        public async Task<IActionResult> ChangeUserPassword(ChangePasswordDTO changePasswordDTO)
+        {
+            try
+            {
+                var user =await _db.Users.Where(x => x.Id == changePasswordDTO.UserId).FirstOrDefaultAsync();
+                if(user == null)
+                {
+                    _response.IsSuccess = false;
+                    _response.Notification = "khong tim thay nguoi dung";
+                    _response.Data = null;
+                    return BadRequest(_response);
+                }
+                var result = await _userManager.ChangePasswordAsync(user, changePasswordDTO.OldPassword, changePasswordDTO.NewPassword);
+                if(result.Succeeded)
+                {
+                    _response.IsSuccess = true;
+                    _response.Notification = "doi mat khau thanh cong";
+                    _response.Data = "";
+                    return Ok (_response);
+                }
+                else
+                {
+                    _response.IsSuccess = false;
+                    _response.Notification = "doi mat khau that bai";
+                    _response.Data = result.Errors;
+                    return BadRequest(_response);
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Notification = "loi";
+                _response.Data=ex.Message;
+                return BadRequest(_response);   
+            }
+        }
+        [HttpPut("UpdateUserInformation")]
+        public async Task<IActionResult> UpdateUserInformation([FromForm] UserInformationDTO userInformationDTO)
+        {
+            try
+            {
+                var user = await _db.Users.Where(x => x.Id == userInformationDTO.UserId).FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    _response.IsSuccess = false;
+                    _response.Notification = "khong tim thay nguoi dung";
+                    _response.Data = null;
+                    return BadRequest(_response);
+                }
+
+                user.Name = userInformationDTO.Name;
+                user.RegionId = userInformationDTO.RegionId;
+
+                if(userInformationDTO.Avatar != null)
+                {
+                    var fileExtension = Path.GetExtension(userInformationDTO.Avatar.FileName);
+                    var fileName = $"{userInformationDTO.UserId}{fileExtension}";
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/avatars", fileName);
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+
+                    using(var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await userInformationDTO.Avatar.CopyToAsync(stream);
+                    }
+
+                    user.Avatar = fileName;
+                }
+                await _db.SaveChangesAsync();
+                _response.IsSuccess = true;
+                _response.Notification = "cap nhat thong tin thanh cong";
+                _response.Data = user;
+                return Ok (_response);
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Notification = "loi";
+                _response.Data = ex.Message;
+                return BadRequest(_response);
+            }
+        }
+        [HttpDelete("DeleteAccount/{userId}")]
+        public async Task<IActionResult> DeleteAccount(string userId)
+        {
+            try
+            {
+                var user = await _db.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+                if(user == null)
+                {
+                    _response.IsSuccess = false;
+                    _response.Notification = "khong tim that nguoi dung";
+                    _response.Data = null;
+                    return BadRequest(_response);
+                }
+                user.IsDeleted = true;
+                await _db.SaveChangesAsync();
+                _response.IsSuccess = true;
+                _response.Notification = "xoa nguoi dung thanh cong";
+                _response.Data = user;
+                return Ok(_response);
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Notification = "loi";
+                _response.Data = ex.Message;
+                return BadRequest(_response);
+            }
+        }
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(string Email)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(Email);
+                if(user == null)
+                {
+                    _response.IsSuccess = false;
+                    _response.Notification = "khong tim that nguoi dung";
+                    _response.Data = null;
+                    return BadRequest(_response);
+                }
+                Random random = new();
+                string OTP = random.Next(100000, 999999).ToString();
+                user.OTP = OTP;
+                await _userManager.UpdateAsync(user);
+                await _db.SaveChangesAsync();
+                string subject = "reset password Game 106 - " + Email;
+                string message = "ma OTP cua ban la; " + OTP;
+                _response.IsSuccess = true;
+                _response.Notification = "gui ma OTP thanh cong";
+                _response.Data = "email send to " + Email;
+                return Ok(_response);
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Notification = "loi";
+                _response.Data = ex.Message;
+                return BadRequest(_response);
+            }
+        }
+        [HttpPost("CheckOTP")]
+        public async Task<IActionResult> CheckOTP(CheckOTPDTO checkOTPDTO)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(checkOTPDTO.Email);
+                if(user == null)
+                {
+                    _response.IsSuccess = false;
+                    _response.Notification = "khong tim that nguoi dung";
+                    _response.Data = null;
+                    return BadRequest(_response);
+                }
+                var stringOTP = Convert.ToInt32(checkOTPDTO.OTP).ToString();
+                if(stringOTP == user.OTP)
+                {
+                    _response.IsSuccess = true;
+                    _response.Notification = "ma OTP chinh xac";
+                    _response.Data = user.Email;
+                    return Ok(_response);
+                }
+                else
+                {
+                    _response.IsSuccess = false;
+                    _response.Notification = "ma OTP khong chinh xac";
+                    _response.Data = null;
+                    return BadRequest(_response);
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Notification = "loi";
+                _response.Data = ex.Message;
+                return BadRequest(_response);
+            }
+        }
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPasswordDTO)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(resetPasswordDTO.Email);
+                if(user == null)
+                {
+                    _response.IsSuccess = false;
+                    _response.Notification = "khong tim that nguoi dung";
+                    _response.Data = null;
+                    return BadRequest(_response);
+                }
+                var stringOTP = Convert.ToInt32(resetPasswordDTO.OTP).ToString();
+                if(stringOTP == user.OTP)
+                {
+                    DateTime now = DateTime.Now;
+                    user.OTP = $"{stringOTP}_used_" + now.ToString("yyyy_MM_dd_HH_mm_ss");
+
+                    var passwordHasher = new PasswordHasher<IdentityUser>();
+                    user.PasswordHash = passwordHasher.HashPassword(user, resetPasswordDTO.NewPassword);
+
+                    var result = await _userManager.UpdateAsync(user);
+                    if(result.Succeeded)
+                    {
+                        _response.IsSuccess = true;
+                        _response.Notification = "doi mat khau thanh cong";
+                        _response.Data = resetPasswordDTO.Email;
+                        return Ok(_response);
+                    }
+                    else
+                    {
+                        _response.IsSuccess = false;
+                        _response.Notification = "doi mat khau that bai";
+                        _response.Data = result.Errors;
+                        return BadRequest(_response);
+                    }
+                }
+                else
+                {
+                    _response.IsSuccess = false;
+                    _response.Notification = "ma OTP khong chinh xac ";
+                    _response.Data = null;
+                    return BadRequest(_response);
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Notification = "loi";
+                _response.Data = ex.Message;
+                return BadRequest(_response);
+            }
+        }
     }
 }
