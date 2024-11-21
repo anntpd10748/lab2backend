@@ -17,7 +17,7 @@ namespace ServerGame106.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -177,6 +177,9 @@ namespace ServerGame106.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -194,6 +197,10 @@ namespace ServerGame106.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("OTP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -365,7 +372,7 @@ namespace ServerGame106.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RegionId"));
 
-                    b.Property<string>("RegionName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -377,12 +384,12 @@ namespace ServerGame106.Migrations
                         new
                         {
                             RegionId = 1,
-                            RegionName = "dong bang song hong"
+                            Name = "dong bang song hong"
                         },
                         new
                         {
                             RegionId = 2,
-                            RegionName = "dong bang song cuu long"
+                            Name = "dong bang song cuu long"
                         });
                 });
 

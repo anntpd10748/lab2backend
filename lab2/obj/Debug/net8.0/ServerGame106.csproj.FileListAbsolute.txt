@@ -151,3 +151,6 @@ D:\H\GAM106_GameBackEnd\test\lab2\lab2\bin\Debug\net8.0\Swashbuckle.AspNetCore.S
 D:\H\GAM106_GameBackEnd\test\lab2\lab2\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 D:\H\GAM106_GameBackEnd\test\lab2\lab2\obj\Debug\net8.0\ServerGame106.MvcApplicationPartsAssemblyInfo.cs
 D:\H\GAM106_GameBackEnd\test\lab2\lab2\obj\Debug\net8.0\ServerGame106.sourcelink.json
+D:\H\GAM106_GameBackEnd\test\lab2\lab2\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+D:\H\GAM106_GameBackEnd\test\lab2\lab2\bin\Debug\net8.0\MailKit.dll
+D:\H\GAM106_GameBackEnd\test\lab2\lab2\bin\Debug\net8.0\MimeKit.dll
