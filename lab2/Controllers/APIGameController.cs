@@ -442,8 +442,9 @@ namespace ServerGame106.Controllers
                 user.OTP = OTP;
                 await _userManager.UpdateAsync(user);
                 await _db.SaveChangesAsync();
-                string subject = "reset password Game 106 - " + Email;
+                string subject = "reset password GA105 - " + Email;
                 string message = "ma OTP cua ban la; " + OTP;
+                await _emailService.SendEmailAsync(Email, subject, message);
                 _response.IsSuccess = true;
                 _response.Notification = "gui ma OTP thanh cong";
                 _response.Data = "email send to " + Email;
@@ -571,7 +572,7 @@ namespace ServerGame106.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
         [HttpGet("GetAllResultByUser/{userId}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetAllResultByUser(string userId)
         {
             try

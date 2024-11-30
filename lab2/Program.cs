@@ -1,3 +1,4 @@
+using lab2.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,17 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = "/Home/AccessDenied";
+    options.LoginPath = "/Home/Login";
+    options.LogoutPath = "/Home/Logout";
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    options.SlidingExpiration = true;
+});
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<IEmailService, EmailService>();
@@ -54,7 +65,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddAuthentication(option =>
+/*builder.Services.AddAuthentication(option =>
 {
     option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -71,7 +82,8 @@ builder.Services.AddAuthentication(option =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
-});
+});*/
+
 
 var app = builder.Build();
 
@@ -90,11 +102,35 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+using(var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    CreateRoles(services).Wait();
+}
+
 app.Run();
+
+async Task CreateRoles(IServiceProvider serviceProvider)
+{
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    string[] roleNames = { "Admin", "User" };
+    IdentityResult roleResult;
+
+    foreach (var roleName in roleNames)
+    {
+        var roleExist = await roleManager.RoleExistsAsync(roleName);
+        if (!roleExist)
+        {
+            roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
+        }
+    }
+}
